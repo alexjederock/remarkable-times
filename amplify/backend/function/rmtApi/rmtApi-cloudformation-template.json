@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "rmtExpressBackend",
+            "rmtApi",
             {
               "Fn::Join": [
                 "",
                 [
-                  "rmtExpressBackend",
+                  "rmtApi",
                   "-",
                   {
                     "Ref": "env"
@@ -69,26 +69,8 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
-            },
-            "RMT_CLUSTER_SECRET_NAME": {
-              "Fn::ImportValue": "RmtClusterSecretName"
             }
           }
-        },
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            {
-              "Fn::ImportValue": "RmtDbSecurityGroupId"
-            }
-          ],
-          "SubnetIds": [
-            {
-              "Fn::ImportValue": "RmtVpcSubnet01"
-            },
-            {
-              "Fn::ImportValue": "RmtVpcSubnet02"
-            }
-          ]
         },
         "Role": {
           "Fn::GetAtt": [
@@ -98,7 +80,7 @@
         },
         "Runtime": "nodejs14.x",
         "Layers": [],
-        "Timeout": "35"
+        "Timeout": "25"
       }
     },
     "LambdaExecutionRole": {
@@ -107,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "remarkablefrontendLambdaRolec681e1ea",
+            "remarkabletimesLambdaRole6a05e409",
             {
               "Fn::Join": [
                 "",
                 [
-                  "remarkablefrontendLambdaRolec681e1ea",
+                  "remarkabletimesLambdaRole6a05e409",
                   "-",
                   {
                     "Ref": "env"
@@ -158,46 +140,26 @@
             {
               "Effect": "Allow",
               "Action": [
-                "secretsmanager:GetSecretValue"
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
               ],
               "Resource": {
                 "Fn::Sub": [
-                  "arn:aws:secretsmanager:us-east-1:466357709346:secret:AuroraRmtClusterSecret4E98D-6A81GfZuLFDR-Y2r3sE",
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
                   {
                     "region": {
                       "Ref": "AWS::Region"
                     },
                     "account": {
                       "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
                     }
                   }
                 ]
               }
-            },
-            {
-              "Sid": "VisualEditor0",
-              "Effect": "Allow",
-              "Action": [
-                "ec2:CreateNetworkInterface",
-                "logs:CreateLogStream",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface",
-                "ec2:UnassignPrivateIpAddresses",
-                "ec2:AssignPrivateIpAddresses",
-                "logs:CreateLogGroup",
-                "logs:PutLogEvents"
-              ],
-              "Resource": "*"
-            },
-            {
-              "Sid": "VisualEditor1",
-              "Effect": "Allow",
-              "Action": [
-                "logs:CreateLogStream",
-                "logs:CreateLogGroup",
-                "logs:PutLogEvents"
-              ],
-              "Resource": "arn:aws:logs:us-east-1:466357709346:log-group:/aws/lambda/rmtExpressBackend-bri:log-stream:*"
             }
           ]
         }
